@@ -10,13 +10,14 @@
     prompt: .asciiz "Enter a hexa decimal number: " 
 .text
     #prompt the user for input
-    li $v0, 4 
-    la $a0, prompt 
-    syscall
-
-    #get the user's input 
-    li $v0, 5 
+    la $s0, prompt
+    li $t0, 0 #iterator
+loop:
+    bgt $t0, 15, exit 
+    addi $t0, $t0, 1
+    add $s1, $s0, $t0
+    li $v0 1
     syscall 
 
-    #store the result in $t0 
-    move $t0, $v0 
+    j loop
+exit: 
