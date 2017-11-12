@@ -6,18 +6,27 @@
 # decimal(s) = 0 * 16^5 + 10 * 16^4 + 15 * 16^3 + 3 * 16^2 + 4 * 16^1 + 14 * 16^0 
 #4 store it to a register and print out the value 
 
-.data 
-    prompt: .asciiz "Enter a hexa decimal number: " 
-.text
-    #prompt the user for input
-    la $s0, prompt
-    li $t0, 0 #iterator
-loop:
-    bgt $t0, 15, exit 
-    addi $t0, $t0, 1
-    add $s1, $s0, $t0
-    li $v0 1
-    syscall 
-
-    j loop
-exit: 
+.data
+	array: .word 4:6
+.text 
+	#index 
+	add $t0, $zero, 0
+	add $t1, $zero, 0
+	add $s0, $zero, 0
+	while: 
+		bne $t0, 24, exit
+		
+		lw $t6, array($t0)
+		add $t3, $zero, 0
+		add $t4, $zero, 16
+		add $t2, $zero, 16
+		innerLoop:
+			bne $t3, $t1, exit2 
+			mult $t2, $t2
+			mflo $t2
+			j innerLoop
+		exit2: 
+		add $t0, $t0, 4
+		add $t1, $t1, 1
+		j while 
+	exit: 
