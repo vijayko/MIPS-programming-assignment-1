@@ -6,27 +6,54 @@
 # decimal(s) = 0 * 16^5 + 10 * 16^4 + 15 * 16^3 + 3 * 16^2 + 4 * 16^1 + 14 * 16^0 
 #4 store it to a register and print out the value 
 
-.data
-	array: .word 4:6
-.text 
-	#index 
-	add $t0, $zero, 0
-	add $t1, $zero, 0
-	add $s0, $zero, 0
-	while: 
-		bne $t0, 24, exit
+.data 
+	array: .word 4:4
+	newline: .asciiz "\n"
+.text
+	add $t0, $zero, 0 #index of the array
+	add $t1, $zero, 0 #index for the 16s
+	add $s0, $zero, 0 #total sum 
+	add $t7, $zero, 16
+	loop1: 
+		beq $t0, 16, exit1
+		add $t6, $zero, 0 #counter for inner loop 
+		add $t4, $zero, 1 #temp value for 16^x 
 		
-		lw $t6, array($t0)
-		add $t3, $zero, 0
-		add $t4, $zero, 16
-		add $t2, $zero, 16
-		innerLoop:
-			bne $t3, $t1, exit2 
-			mult $t2, $t2
-			mflo $t2
-			j innerLoop
-		exit2: 
-		add $t0, $t0, 4
+		loop2: 
+			beq $t1, $t6, exit2 
+			mult $t4, $t7
+			mflo $t4
+			add $t6, $t6, 1 #increasing the inner counter 
+			
+			j loop2
+		exit2:
 		add $t1, $t1, 1
-		j while 
-	exit: 
+		lw $t3, array($t0)
+		li $v0, 1 
+		addi $a0, $t3, 0 
+		syscall
+		
+		li $v0, 4 
+		la $a0, newline
+		syscall
+		
+		mult $t3, $t4 
+		mflo $t3 
+		add $s0, $s0, $t3
+		
+		li $v0, 1 
+		addi $a0, $s0, 0
+		syscall
+		li $v0, 4 
+		la $a0, newline
+		syscall
+		add $t0, $t0, 4
+		j loop1
+	exit1:
+	li $v0, 1 
+	addi $a0, $s0, 0
+	syscall 
+	
+	li $v0, 10 
+	syscall 
+	
