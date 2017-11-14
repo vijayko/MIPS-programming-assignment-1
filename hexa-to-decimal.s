@@ -7,15 +7,29 @@
 #4 store it to a register and print out the value 
 
 .data 
-	array: .word 4:4
+	array: .space 32
 	newline: .asciiz "\n"
 .text
 	add $t0, $zero, 0 #index of the array
 	add $t1, $zero, 0 #index for the 16s
 	add $s0, $zero, 0 #total sum 
 	add $t7, $zero, 16
+	
+	
+	loop0:
+		beq $t0, 32, exit0
+		li $v0, 5
+		syscall 
+		
+		move $t5, $v0
+		sw $t5, array($t0)
+		add $t0, $t0, 4  
+		
+		j loop0
+	exit0: 
+	add $t0, $zero, 0
 	loop1: 
-		beq $t0, 16, exit1
+		beq $t0, 32, exit1
 		add $t6, $zero, 0 #counter for inner loop 
 		add $t4, $zero, 1 #temp value for 16^x 
 		
