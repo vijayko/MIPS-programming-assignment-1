@@ -7,6 +7,7 @@
 #4 store it to a register and print out the value 
 
 .data 
+	string: .asciiz "04567abcf"
 	array: .space 32
 	newline: .asciiz "\n"
 .text
@@ -15,7 +16,24 @@
 	add $s0, $zero, 0 #total sum 
 	add $t7, $zero, 16
 	
-	
+	la $s0, string
+	add $t0, $zero, 0
+	loop10: 
+		add $s1, $s0, $t0   
+    	lb $s2, 0($s1)      
+    	beq $s2, $zero, exit    #http://stackoverflow.com/questions/12739463/how-to-iterate-a-string-in-mips-assembly
+    	addi $t0, $t0, 1 
+    	
+    	move $a0, $s2
+    	addi $v0, $zero, 11
+    	syscall
+    	
+    	la $a0, newline
+    	addi $v0, $zero, 4
+    	syscall
+    	j loop10
+	exit:
+	add $t0, $zero, 0
 	loop0:
 		beq $t0, 32, exit0
 		li $v0, 5
