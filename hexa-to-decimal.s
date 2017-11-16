@@ -14,32 +14,34 @@
 	message: .asciiz "\nDone"
 .text
 main:
+	#defining some "constants" required later 
+	add $t8, $zero, 10000
 	add $t7, $zero, 16
-	li $v0, 8  #taking the input
+
+	#taking the input from the user
+	li $v0, 8  
     la $a0, max_input
     li $a1, 9
     syscall
     
-    li $v0, 4
-    la $a0, max_input
-    
-    add $t0, $zero, 0 #iterator 
-    la $s0, max_input
+    add $t0, $zero, 0 #iterator for the iterate loop
+    la $s0, max_input #loading max_input to $s0
     
     #checking if the input is valid
+    add $t9, $zero, 0 #counter
     iterate: 
     	add $s1, $s0, $t0   
     	lb $s2, 0($s1)     #loading  
     	
     	#terminating the loop
-    	beq $s2, $zero, convert    #http://stackoverflow.com/questions/12739463/how-to-iterate-a-string-in-mips-assembly
+    	beq $s2, $zero, convert   
     	beq $s2, 10, convert
     	addi $t0, $t0, 1 #iterator++
     	
     	beq $s2, 32, iterate
+
     	#checking if the number is in 0-9, a-f, A-F
 		sub $s3, $s2, 48 
-		
 		blt $s3, 0, exit
 		blt $s3, 10, store
 		sub $s3, $s3, 7
@@ -68,6 +70,7 @@ main:
     	# syscall
     	j iterate
     
+    bgt $t9, $zero, exit
     add $t1, $zero, 0 #iterator 
     add $t5, $zero, 0 #sum
     convert: 
@@ -88,17 +91,29 @@ main:
         	add $t1, $t1, 1
             multu $s4, $t2
             mflo $s4
-            add $t5, $t5, $s4
-            j convert 
+            addu $t5, $t5, $s4
+            divu $t5, $t8
+			mflo $s5
+			mfhi $s6
+            j convert
+
     exit:
         la $a0, error
         addi $v0, $zero, 4
         syscall 
 	exit3:	
+		# div $t5, $t8
+		# mflo $s5
+		# mfhi $s6
+		
 		la $a0, newline
 		li $v0, 4
 		syscall
 		li $v0, 1 
-		addi $a0, $t5, 0
+		addi $a0, $s5, 0
 		syscall 
+		li $v0, 1 
+		addi $a0, $s6, 0
+		syscall 
+		
     
